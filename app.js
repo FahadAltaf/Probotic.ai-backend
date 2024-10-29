@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use('/api/v1/webhook', webhookRoutes);
 app.use('/ping', function (req, res) {
     res.status(200).json({ message: 'ok' });
-});
+}); 
 
 app.use(ClerkExpressWithAuth()); // This middleware is used to authenticate requests using Clerk
 
