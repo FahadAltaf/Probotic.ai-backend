@@ -9,10 +9,16 @@ const checkPermission = (permission) => {
         res.status(403).json({ error: 'Permission denied' });
     };
 };
+const getUserIdFromToken = (req) => {
+    if (!req.auth || !req.auth.userId) {
+        res.status(401).json({ error: 'Authentication required' });
+    }
+    return req.auth.userId;
+};
 
 module.exports = {
     getAuth,
     checkPermission,
     requireAuth,
-
+    getUserIdFromToken,
 };

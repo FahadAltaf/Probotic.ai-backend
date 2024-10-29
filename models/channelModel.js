@@ -1,8 +1,10 @@
 const prisma = require("../config/prisma");
-const { hasPermission, getSession, getAuth } = require("../helpers/auth");
+const { hasPermission, getUserIdFromToken, getAuth } = require("../helpers/auth");
 
 const platformList = async (req) => {
-    const { userId, organizationId, chatbot_id } = req.body;
+    const { organizationId, chatbot_id } = req.body;
+    // const user = getUserIdFromToken(req);
+
     try {
         const platforms = await prisma.messagingPlatform.findMany({
             where: {
@@ -71,7 +73,9 @@ const fetchChannels = async (req) => {
 }
 
 const storeChannels = async (req) => {
-    const { userId, organizationId, name, platformName, configuration } = req.body;
+    const { organizationId, name, platformName, configuration } = req.body;
+    const userId = getUserIdFromToken(req);
+
     try {
         const platform = await findPlatformByName(platformName);
         const newChannel = await prisma.channels.create({
