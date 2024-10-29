@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// MODEL_IMPORTS
+
+
+model ChannelOwners {
+    id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    created_at     DateTime @default(now()) @db.Timestamptz
+    updated_at     DateTime @updatedAt @db.Timestamptz
+    channel_id     String   @db.Uuid
+    user_id        String?
+    orgnization_id String?
+
+    channel Channels @relation(fields: [channel_id], references: [id])
+    user    Users?   @relation(fields: [user_id], references: [id])
+
+    @@index([orgnization_id, user_id])
+    @@map("channel_owners")
+}
+
+
+
+model Channels {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz
+  updated_at     DateTime @updatedAt @db.Timestamptz
+  name           String?
+  platform_id    String   @db.Uuid
+  platform_name  String?
+  orgnization_id String?
+  configuration  Json?
+  chatbot_id     String?
+
+  platform MessagingPlatform @relation(fields: [platform_id], references: [id])
+  owners   ChannelOwners[]
+
+  @@index([orgnization_id, platform_id, chatbot_id, id])
+  @@map("channels")
+}
+
+
+
+model Chatbots {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at           DateTime @default(now()) @db.Timestamptz
+  updated_at           DateTime @updatedAt @db.Timestamptz
+  orgnization_id       String?
+  user_id              String?
+  name                 String?
+  title                String?
+  description          String?
+  platform             String?
+  published            Boolean  @default(false)
+  chatbot_id           String?
+  configuration        Json?
+  deleted              Boolean  @default(false)
+  tags                 Json?
+  type                 Int?
+  role                 String?
+  industry             String?
+  capabilities         Json?
+  business_information Json?
+  faqs                 Json?
+  products             Json?
+  documents            Json?
+  is_trained           Boolean?
+  avatar               String?
+  plain_text           String?
+
+  @@map("chatbots")
+  @@index([orgnization_id,user_id])
+
+}
+
+
+
+model Contacts {
+    id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    created_at     DateTime @default(now()) @db.Timestamptz
+    updated_at     DateTime @updatedAt @db.Timestamptz
+    created_by_id  String?
+    created_by     String?
+    orgnization_id String?
+    user_id        String?
+    name           String?
+    first_name     String?
+    last_name      String?
+    middle_name    String?
+    emails         Json?
+    phones         Json?
+    avatar         String?
+    source         Json?
+
+    @@index([orgnization_id, user_id])
+    @@map("contacts")
+}
+
+
+
+model Conversations {
+    id                          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    created_at                  DateTime  @default(now()) @db.Timestamptz
+    title                       String?
+    contact                     Json?
+    channel                     Json?
+    agent                       Json?
+    needs_attention             Boolean   @default(false)
+    attention_reason            String?
+    last_message_timestamp      DateTime? @db.Timestamptz
+    last_user_message_timestamp DateTime? @db.Timestamptz
+    unread_count                Int       @default(0)
+    tags                        Json?
+    controlled_by               String?
+    last_message_by             String?
+    description                 String?
+    platform_thread_id          String?
+    orgnization_id              String?
+
+    @@map("conversations")
+
+}
+
+
+
+model Messages {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at          DateTime @default(now()) @db.Timestamptz
+  orgnization_id      String?
+  conversation_id     String?
+  sender              String?
+  agent               Json?
+  content             String?
+  content_type        String?
+  is_new              Boolean  @default(true)
+  attachments         Json?
+  platform_identifier String?
+
+  @@map("messages")
+  @@index([orgnization_id,conversation_id])
+
+}
+
+
+
+model MessagingPlatform {
+    id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    created_at   DateTime @default(now()) @db.Timestamptz
+    name         String?
+    description  String?
+    icon         String?
+    is_available Boolean? @default(true)
+
+    channels Channels[]
+
+    @@map("messaging_platform")
+}
+
+
+
+model Orgnizations {
+    id         String   @id
+    created_at DateTime @default(now()) @db.Timestamptz
+    name       String?
+    email      String?
+    phone      String?
+    address    String?
+    @@map("orgnizations")
+    @@index([id])
+}
+
+
+
+model Users {
+  id              String   @id
+  created_at      DateTime @default(now()) @db.Timestamptz
+  name            String?
+  avatar          String?
+  organization_id String
+  role            String
+
+  channels ChannelOwners[]
+
+  @@index([organization_id, id])
+  @@map("users")
+}
+

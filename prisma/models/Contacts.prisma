@@ -1,0 +1,25 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Contacts {
+    id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    created_at     DateTime @default(now()) @db.Timestamptz
+    updated_at     DateTime @updatedAt @db.Timestamptz
+    created_by_id  String?
+    created_by     String?
+    orgnization_id String?
+    user_id        String?
+    name           String?
+    first_name     String?
+    last_name      String?
+    middle_name    String?
+    emails         Json?
+    phones         Json?
+    avatar         String?
+    source         Json?
+
+    @@index([orgnization_id, user_id])
+    @@map("contacts")
+}

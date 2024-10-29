@@ -1,0 +1,18 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id              String   @id
+  created_at      DateTime @default(now()) @db.Timestamptz
+  name            String?
+  avatar          String?
+  organization_id String
+  role            String
+
+  channels ChannelOwners[]
+
+  @@index([organization_id, id])
+  @@map("users")
+}

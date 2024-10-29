@@ -1,0 +1,27 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Conversations {
+    id                          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    created_at                  DateTime  @default(now()) @db.Timestamptz
+    title                       String?
+    contact                     Json?
+    channel                     Json?
+    agent                       Json?
+    needs_attention             Boolean   @default(false)
+    attention_reason            String?
+    last_message_timestamp      DateTime? @db.Timestamptz
+    last_user_message_timestamp DateTime? @db.Timestamptz
+    unread_count                Int       @default(0)
+    tags                        Json?
+    controlled_by               String?
+    last_message_by             String?
+    description                 String?
+    platform_thread_id          String?
+    orgnization_id              String?
+
+    @@map("conversations")
+
+}
