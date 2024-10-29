@@ -20,7 +20,7 @@ const apiRouter = express.Router();
 app.use(bodyParser.json());
 app.use('/api/v1/webhook', webhookRoutes);
 
-app.use(ClerkExpressWithAuth());
+app.use(ClerkExpressWithAuth()); // This middleware is used to authenticate requests using Clerk
 
 // Move API routes setup outside of the root route
 apiRouter.use('/chatbots', chatbotRoutes);
