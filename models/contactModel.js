@@ -1,7 +1,7 @@
 const prisma = require("../config/prisma");
 
 const fetchContacts = async (req) => {
-    const { organizationId, userId, page = 1, pageSize = 10, search } = req.body;
+    const { organizationId,  page = 1, pageSize = 10, search } = req.body;
     try {
         const skip = (page - 1) * pageSize;
         const take = pageSize;

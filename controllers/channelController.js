@@ -23,7 +23,8 @@ const getPlatformList = async (req, res) => {
 const getChannels = async (req, res) => {
     try {
         const channels = await fetchChannels(req);
-        res.status(200).json(channels);
+        const platforms = await platformList(req);
+        res.status(200).json({ channels, platforms });
     } catch (error) {
         console.error('Error fetching channels:', error);
         res.status(500).json({ message: 'Internal server error' });
