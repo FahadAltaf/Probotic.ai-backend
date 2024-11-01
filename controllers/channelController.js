@@ -1,4 +1,4 @@
-const { findChannelByUId, platformList, fetchChannels ,storeChannels ,updateChannel } = require('../models/channelModel');
+const { findChannelByUId, platformList, fetchChannels, storeChannels, updateChannel, fetchChannelsSupabase } = require('../models/channelModel');
 
 const findChannel = async (req, res) => {
     try {
@@ -31,7 +31,16 @@ const getChannels = async (req, res) => {
 
     }
 }
+const getChannelsSupabase = async (req, res) => {
+    try {
+        const channels = await fetchChannelsSupabase(req);
+        res.status(200).json({ channels });
+    } catch (error) {
+        console.error('Error fetching channels:', error);
+        res.status(500).json({ message: 'Internal server error' });
 
+    }
+}
 const createChannels = async (req, res) => {
     try {
         const channels = await storeChannels(req);
@@ -53,4 +62,4 @@ const configChannels = async (req, res) => {
     }
 }
 
-module.exports = { findChannel, getPlatformList, getChannels,createChannels,configChannels };
+module.exports = { findChannel, getPlatformList, getChannels, createChannels, configChannels, getChannelsSupabase };

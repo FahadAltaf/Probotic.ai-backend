@@ -78,6 +78,20 @@ const fetchChannels = async (req) => {
         throw new Error('Failed to fetch channels');
     }
 }
+const fetchChannelsSupabase = async (req) => {
+    try {
+        const response = await fetch('https://ifrswajoxgbsskzmihnu.supabase.co/rest/v1/channels?select=*', {
+            headers: {
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmcnN3YWpveGdic3Nrem1paG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxNzk3MDMsImV4cCI6MjAzOTc1NTcwM30.jHEDTqfnCley7jDH3-yH80Cgym-6cqAmCtUDEjcnWVg'
+            }
+        });
+        const data = await response.json(); // Parse the response body as JSON
+        return data
+    } catch (error) {
+        console.error('Error fetching channels:', error);
+        throw new Error('Failed to fetch channels');
+    }
+}
 
 const storeChannels = async (req) => {
     const { organizationId, name, platformName, configuration } = req.body;
@@ -149,5 +163,6 @@ module.exports = {
     platformList,
     fetchChannels,
     storeChannels,
-    updateChannel
+    updateChannel,
+    fetchChannelsSupabase
 };
