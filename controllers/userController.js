@@ -13,7 +13,7 @@ const storeUser = async (req,res)=>{
 const getUserById = async (req, res) => {
     try {
      
-        const user = await fetchUserById(req);
+        const user = await fetchUserById(req,res);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

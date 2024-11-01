@@ -1,5 +1,7 @@
 const { clerkClient } = require("@clerk/clerk-sdk-node");
-const prisma = require("../config/prisma");
+const PrismaService = require("../config/service");
+const prismaService = new PrismaService();
+
 
 const insertOrganization = async (data) => {
     try {
@@ -12,12 +14,18 @@ const insertOrganization = async (data) => {
             email: data.email_addresses?.[0]?.email_address || null,
             phone: data.phone_numbers?.[0]?.phone_number || null,
             address: "",
-            id: clerkOrg.id
+            id: clerkOrg.id,
+            created_at: new Date(),
         }
-        const newOrganization = await prisma.orgnizations.create({
-            data: orgPayload
+
+     
+        Object.keys(orgPayload).forEach(key => {
+            if (data[key] === undefined) {
+                delete data[key];
+            }
         });
-        return newOrganization;
+
+        return  await prismaService.insert('orgnizations', orgPayload);
     } catch (error) {
         console.error('Error inserting organization:', error);
         throw new Error('Failed to insert organization');

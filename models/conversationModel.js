@@ -1,18 +1,22 @@
-const prisma = require("../config/prisma");
+const PrismaService = require("../config/service");
+const prismaService = new PrismaService();
 
 
 const fetchConversation = async (req) => {
-    const { organization_id } = req.body;
+    const { organizationId, chatbot_id } = req.body;
     try {
-        return await prisma.conversations.findMany({
-            where: { organization_id }
-        });
-    } catch (error) {
-        console.error('Error fetching chatbots:', error);
-        throw new Error('Failed to fetch chatbots');
-    }
-};
+        const conditions = [
+            { fieldName: 'orgnization_id', fieldValue: organizationId }
+        ];
+        
+        const conversations = await prismaService.getManyByMultipleFields('conversations', conditions);
 
+        return conversations;
+    } catch (error) {
+        console.error('Error finding conversations:', error);
+        throw new Error('Failed to find conversations');
+    }
+}
 
 module.exports = {
     fetchConversation,

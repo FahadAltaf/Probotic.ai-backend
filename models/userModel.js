@@ -1,25 +1,29 @@
-const prisma = require("../config/prisma");
 const { clerkClient } = require('@clerk/clerk-sdk-node');
 const { insertOrganization } = require("../models/orgnizationModel");
+
+const PrismaService = require("../config/service");
+const prismaService = new PrismaService();
 
 const insertUser = async (webhookPayload) => {
     try {
         const data = webhookPayload;
         try {
-            let user = await prisma.users.findUnique({
-                where: { id: data.id }
-            });
+            let user = await prismaService.getById('users', 'id', data.id, false);
             if (!user) {
                 const newOrg = await insertOrganization(data);
-                user = await prisma.users.create({  
-                    data: {
+                   const userData = {
                         id: data.id,
                         name: `${data.first_name} ${data.last_name}`.trim(),
                         avatar: data.image_url,
                         organization_id: newOrg.id,
                         role: 'admin',
+                   }
+                Object.keys(userData).forEach(key => {
+                    if (userData[key] === undefined) {
+                        delete userData[key];
                     }
                 });
+                user = await prismaService.insert('users', userData);
                 if (newOrg.id && data.id) {
                     try {
                         await clerkClient.organizations.updateOrganizationMembership({
@@ -27,7 +31,6 @@ const insertUser = async (webhookPayload) => {
                             userId: data.id,
                             role: 'org:admin'
                         });
-                        
                         await setActiveOrganization(data.id, newOrg.id);
                     } catch (clerkError) {
                         console.error('Error updating Clerk organization membership:', clerkError);
@@ -60,19 +63,14 @@ const setActiveOrganization = async (userId, organizationId) => {
     }
 };
 
+
 const fetchUserById = async (req) => {
     try {
         const { userId } = req.body;
-        const user = await prisma.users.findUnique({
-            where: {
-                id: userId
-            }
-        });
-
+        const user = await prismaService.getById('users', 'id', userId, false);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
         return user;
     } catch (error) {
         console.error('Error fetching user by ID:', error);
